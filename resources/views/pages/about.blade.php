@@ -1,5 +1,5 @@
-<h1>About page</h1>
+@extends('layouts.app')
 
-<?php
-
-echo "Hello, man";
+@section('content')
+<h1>About</h1>
+@endsection

@@ -343,7 +343,21 @@ class PagesController extends Controller
 *resources/views/layouts/app.blade.php*
 
 ```php
-<link rel="stylesheet" href="{{asset('css/app.css')}}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ config('app.name', 'Laravel APP') }}</title>
+    <link rel="stylesheet" href="{{asset('css/app.css')}}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+
+@yield('content')
+
+<script src="{{asset('js/app.js')}}"></script>
+</body>
+</html>
 ```
 
 В папке *assets/* содержатся исходники стилей и скриптов, которые компилируются в версию для продакшена. В файле *assets/sass/app.scss*, то мы увидим от куда у нас импортируются стили. В том числе импорт есть из папки `@import "~bootstrap-sass/assets/stylesheets/bootstrap"` - это путь к папке *node_modules*, которой у нас пока что нет, поэтому нам нужно запустить команду `npm install`, чтобы поставить все необходимые зависимости в проект.
@@ -426,24 +440,30 @@ body{
 *resources/views/include/navbar.blade.php*
 
 ```php
-<nav class="navbar navbar-inverse">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">{{config('app.name', 'Laravel APP')}}</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="about">About</a></li>
-                <li><a href="services">Services</a></li>
-            </ul>
-        </div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">{{config('app.name', 'Laravel APP')}}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/services">Services</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/contact">Contact</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
     </div>
 </nav>
 ```
