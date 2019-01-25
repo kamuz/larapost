@@ -360,7 +360,7 @@ class PagesController extends Controller
 </html>
 ```
 
-В папке *assets/* содержатся исходники стилей и скриптов, которые компилируются в версию для продакшена. В файле *assets/sass/app.scss*, то мы увидим от куда у нас импортируются стили. В том числе импорт есть из папки `@import "~bootstrap-sass/assets/stylesheets/bootstrap"` - это путь к папке *node_modules*, которой у нас пока что нет, поэтому нам нужно запустить команду `npm install`, чтобы поставить все необходимые зависимости в проект.
+В папке *resources/* содержатся исходники стилей и скриптов, которые компилируются в версию для продакшена. В файле *resources/sass/app.scss*, то мы увидим от куда у нас импортируются стили. В том числе импорт есть из папки `@import '~bootstrap/scss/bootstrap';"` - это путь к папке *node_modules*, которой у нас пока что нет, поэтому нам нужно запустить команду `npm install`, чтобы поставить все необходимые зависимости в проект.
 
 И если мы посмотрим в файл *package.json* в корне приложения, то мы увидим список зависимостей, которые будут установленны вместе с Bootstrap, например `laravel-mix` будет делать компиляцию стилей и скриптов, а `vue` - это JS библиотека, которая используется для создания интерфейсов и одностраничных приложений.
 
@@ -374,7 +374,7 @@ npm install
 
 Теперь мы можем изменять исходники и компилировать стили, для этого можем поправить одну переменную:
 
-*resources/assets/sass/_variables.scss*
+*resources/sass/_variables.scss*
 
 ```scss
 $body-bg: red;
@@ -400,7 +400,7 @@ npm run watch
 
 Если вам нужно создать ваш собственный файл стилей, то вы можете создать файл:
 
-*resources/assets/sass/_custom.scss*
+*resources/sass/_custom.scss*
 
 ```scss
 body{
@@ -410,7 +410,7 @@ body{
 
 Теперь нужно импортировать данный файл:
 
-*resources/assets/sass/app.scss*
+*resources/sass/app.scss*
 
 ```scss
 // Custom
@@ -440,30 +440,25 @@ body{
 *resources/views/include/navbar.blade.php*
 
 ```php
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">{{config('app.name', 'Laravel APP')}}</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/about">About</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/services">Services</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/contact">Contact</a>
-            </li>
-        </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-laravel">
+    <div class="container">
+        <a class="navbar-brand" href="/">{{config('app.name', 'Laravel APP')}}</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/services">Services</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 ```
@@ -485,4 +480,209 @@ body{
 </div>
 <h1>{{$title}}</h1>
 @endsection
+```
+
+## Модели и миграции базы данных
+
+В самом начале нам нужно создать БД и пользователя (если нужно).
+
+Затем нам нужно создать модель `Post` и миграцию для неё:
+
+```bash
+php artisan make:model Post -m
+```
+
+Мы увидим что у нас создалась модель *app/Post.php* и файл миграций *database/migrations/2019_01_25_225715_create_posts_table.php*.
+
+В методе `up()` класса `CreatePostTable` используется статический метод `create()` объекта `Schema` в котором мы описываем поля, которые нам необходимо создать. Нам нужно добавить несколько полей:
+
+*database/migrations/2017_11_30_183740_create_posts_table.php*
+
+```php
+class CreatePostsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->mediumText('body');
+            $table->timestamps();
+        });
+    }
+    //..
+```
+
+В методе `down()` описывается что должно происходить при откате миграции - по умолчанию у нас удаляется текущая таблица в БД.
+
+Вы также должны заметить что у нас уже существуют миграции, которые создадут для нас таблицу с пользователями и сброса пароля.
+
+Перед тем как запускать миграции нам в начале нужно настроить подключение к БД в файле *.env*.
+
+*.env*
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laracms
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Если сейчас запустить миграцию, то мы вероятней всего получим следующую ошибку:
+
+```
+php artisan migrate
+Migration table created successfully.
+Migrating: 2014_10_12_000000_create_users_table
+
+   Illuminate\Database\QueryException  : SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes (SQL: alter table `users` add unique `users_email_unique`(`email`))
+
+  at D:\Server\domains\laracms.loc\vendor\laravel\framework\src\Illuminate\Database\Connection.php:664
+    660|         // If an exception occurs when attempting to run a query, we'll format the error
+    661|         // message to include the bindings with SQL, which will make this exception a
+    662|         // lot more helpful to the developer instead of just the database's errors.
+    663|         catch (Exception $e) {
+  > 664|             throw new QueryException(
+    665|                 $query, $this->prepareBindings($bindings), $e
+    666|             );
+    667|         }
+    668|
+
+  Exception trace:
+
+  1   PDOException::("SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes")
+      D:\Server\domains\laracms.loc\vendor\laravel\framework\src\Illuminate\Database\Connection.php:458
+
+  2   PDOStatement::execute()
+      D:\Server\domains\laracms.loc\vendor\laravel\framework\src\Illuminate\Database\Connection.php:458
+
+  Please use the argument -v to see more details.
+```
+
+Чтобы решить эту проблему нужно поправить файл:
+
+*app/Providers/AppServiceProvider.php*
+
+```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        Schema::defaultStringLength(191);
+    }
+    //..
+```
+
+Теперь можно запустить миграцию:
+
+```bash
+php artisan migrate
+```
+
+В итоге у нас должно появится 4 таблицы в БД. Теперь нам нужно добавить в таблицу данные, чтобы можно было дальше продолжить работу. Это можно сделать вручную, а можно использовать консольную утилиту `tinker`:
+
+* Запускаем `tinker`
+* Проверяем количество записей в таблице `post`
+* Создаём экземпляр объекта `Post`
+* Устанавливаем `title` и `body` для нашего объекта
+* Сохраняем запись в БД
+
+```
+php artisan tinker
+Psy Shell v0.8.15 (PHP 7.1.11 — cli) by Justin Hileman
+>>> App\Post::count()
+=> 0
+>>> $post = new App\Post();
+=> App\Post {#737}
+>>> $post->title = 'Post One';
+=> "Post One"
+>>> $post->body = 'This is the post body';
+=> "This is the post body"
+>>> $post->save();
+=> true
+>>> $post = new App\Post();
+=> App\Post {#748}
+>>> $post->title = 'Post Two';
+=> "Post Two"
+>>> $post->body = 'Another body for second post';
+=> "Another body for second post"
+>>> $post->save();
+=> true
+```
+
+В большинстве случаев всегда требуется несколько методов при работе с какими-либо объектами:
+
+* `index` - список всех записей
+* `create` - создание записи
+* `store` - сохранение записи в БД
+* `edit` - редактирование записи
+* `update` - сохранение обновлённой записи
+* `show` - отобразить конкретную запись
+* `destroy` - удалить запись
+
+Чтобы не создавать эти методы самостоятельно, можно этот процес автоматизировать с помощью команды:
+
+```bash
+php artisan make:controller PostsController --resource
+```
+
+Как видим все эти методы уже создались за нас автоматически.
+
+Теперь осталось разобраться с роутами. Мы можем посмотреть список доступных роутов с помощью команды:
+
+```
+php artisan route:list
++--------+----------+----------+------+-----------------------------------------------+--------------+
+| Domain | Method   | URI      | Name | Action                                        | Middleware   |
++--------+----------+----------+------+-----------------------------------------------+--------------+
+|        | GET|HEAD | /        |      | App\Http\Controllers\PagesController@index    | web          |
+|        | GET|HEAD | about    |      | App\Http\Controllers\PagesController@about    | web          |
+|        | GET|HEAD | api/user |      | Closure                                       | api,auth:api |
+|        | GET|HEAD | services |      | App\Http\Controllers\PagesController@services | web          |
++--------+----------+----------+------+-----------------------------------------------+--------------+
+```
+
+И мы видим список всех роутов, которые были созданны нами и даже те которые создавались системой автоматически и на данным момент не активны.
+
+Чтобы не писать несколько роутов для нашего ресурса, мы можем использовать следующий код:
+
+*routes/web.php*
+
+```php
+Route::resource('posts', 'PostsController');
+```
+
+И если мы сейчас проверим список роутов, то мы убедимся что их именно столько, сколько нам нужно:
+
+```
+php artisan route:list
++--------+-----------+-------------------+---------------+-----------------------------------------------+--------------+
+| Domain | Method    | URI               | Name          | Action                                        | Middleware   |
++--------+-----------+-------------------+---------------+-----------------------------------------------+--------------+
+|        | GET|HEAD  | /                 |               | App\Http\Controllers\PagesController@index    | web          |
+|        | GET|HEAD  | about             |               | App\Http\Controllers\PagesController@about    | web          |
+|        | GET|HEAD  | api/user          |               | Closure                                       | api,auth:api |
+|        | GET|HEAD  | posts             | posts.index   | App\Http\Controllers\PostsController@index    | web          |
+|        | POST      | posts             | posts.store   | App\Http\Controllers\PostsController@store    | web          |
+|        | GET|HEAD  | posts/create      | posts.create  | App\Http\Controllers\PostsController@create   | web          |
+|        | GET|HEAD  | posts/{post}      | posts.show    | App\Http\Controllers\PostsController@show     | web          |
+|        | PUT|PATCH | posts/{post}      | posts.update  | App\Http\Controllers\PostsController@update   | web          |
+|        | DELETE    | posts/{post}      | posts.destroy | App\Http\Controllers\PostsController@destroy  | web          |
+|        | GET|HEAD  | posts/{post}/edit | posts.edit    | App\Http\Controllers\PostsController@edit     | web          |
+|        | GET|HEAD  | services          |               | App\Http\Controllers\PagesController@services | web          |
++--------+-----------+-------------------+---------------+-----------------------------------------------+--------------+
 ```
