@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Post;
 
 class PostsController extends Controller
@@ -20,7 +21,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('created_at', 'desc')->paginate(2);
+        $posts = Post::orderBy('created_at', 'desc')->paginate(4);
         return view('posts.index')->with('posts', $posts);
     }
 
@@ -44,14 +45,29 @@ class PostsController extends Controller
     {
         $this->validate($request, [
             'title' => 'required',
-            'body' => 'required'
+            'body' => 'required',
+            'image' => 'image|nullable|max:1999'
         ]);
+
+        if($request->hasFile('image')){
+            // Get file name with extension
+            $filenameWithExt = $request->file('image')->getClientOriginalName();
+            // Get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            // Get just ext
+            $extension = $request->file('image')->getClientOriginalExtension();
+            // Filename to store
+            $filenameToStore = $filename . '_' . time() . '.' . $extension;
+            // Upload the image
+            $path = $request->file('image')->storeAs('public/images', $filenameToStore);
+        }
 
         // dump($request->all());
         $post = new Post;
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->user_id = auth()->user()->id;
+        $post->image = $filenameToStore;
         $post->save();
 
         // Flash message
@@ -98,12 +114,29 @@ class PostsController extends Controller
     {
         $this->validate($request, [
             'title' => 'required',
-            'body' => 'required'
+            'body' => 'required',
+            'image' => 'image|nullable|max:1999'
         ]);
+
+        if($request->hasFile('image')){
+            // Get file name with extension
+            $filenameWithExt = $request->file('image')->getClientOriginalName();
+            // Get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            // Get just ext
+            $extension = $request->file('image')->getClientOriginalExtension();
+            // Filename to store
+            $filenameToStore = $filename . '_' . time() . '.' . $extension;
+            // Upload the image
+            $path = $request->file('image')->storeAs('public/images', $filenameToStore);
+        }
 
         $post = Post::find($id);
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        if($request->hasFile('image')){
+            $post->image = $filenameToStore;
+        }
         $post->save();
 
         return redirect('/posts')->with('success', 'Post Updated');
@@ -122,6 +155,8 @@ class PostsController extends Controller
         if(auth()->user()->id !== $post->user_id){
             return redirect('/posts')->with('error', 'Unauthorized Page');
         }
+
+        Storage::delete('public/images/'. $post->image);
 
         $post->delete();
         return redirect('/posts')->with('error', 'Post Removed');
