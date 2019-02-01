@@ -1,12 +1,26 @@
 # CMS на базе Laravel
 
+* [Настройка окружения и установка Laravel](#setup)
+* [Основы роутинга и контроллеры](#route)
+* [Blade шаблонизация и компиляция активов](#blade)
+* [Модели и миграции базы данных](#model)
+* [Получение данных с использованием ORM Eloquent](#eloquent)
+* [Установка Font Awesome](#fa)
+* [Формы и сохранение данных](#form)
+* [Редактирование данных](#edit)
+* [Удаление данных](#del)
+* [Авторизация пользователей](#auth)
+* [Связи моделей](#rel)
+
+<div id="setup"></div>
+
 ## Настройка окружения и установка Laravel
 
 Нужно установить XAMPP с поддержкой PHP 7, Git, Composer. Если не ставиться Composer качаем *.phar* архив и пользуемся через консольный PHP.
 
 Переходим в папку *htdocs* XAMPP, запускаем терминал и устанавливаем Laravel с помощью Composer:
 
-```php
+```
 composer create-project laravel/laravel laracms.loc
 ```
 
@@ -53,13 +67,15 @@ laracms.loc
 * *routes/web.php* - файл с роутами
 * *.env* - файл конфигурации, например название проекта, параметры подключения к БД и т. д.
 
+<div id="route"></div>
+
 ## Основы роутинга и контроллеры
 
 Мы можем использовать разные запросы GET, POST, DELETE и это позволяет очень просто создавать RESTful API. Роутинг по синтаксису похож на то что мы имеем в Express/Node.js, то есть мы указываем тип запроса, потом указываем URL или правило роутинга, после чего используем функцию обратного вызова, чтобы указать что именно должно проиходить.
 
 *routes/web.php*
 
-```php
+```
 Route::get('/', function () {
     return view('welcome');
 });
@@ -73,7 +89,7 @@ Route::get('/hello', function () {
 
 *resources/views/pages/about.blade.php*
 
-```php
+```
 <h1>About page</h1>
 
 <?php
@@ -85,7 +101,7 @@ echo "Hello, man";
 
 *routes/web.php*
 
-```php
+```
 Route::get('/about', function () {
     return view('pages.about');
 });
@@ -97,7 +113,7 @@ Route::get('/about', function () {
 
 *routes/web.php*
 
-```php
+```
 Route::get('/users/{id}', function ($id) {
     return "Hi, $id";
 });
@@ -107,7 +123,7 @@ Route::get('/users/{id}', function ($id) {
 
 *routes/web.php*
 
-```php
+```
 Route::get('/users/{id}/{name}', function ($id, $name) {
     return "This is user $name with an ID of $id";
 });
@@ -115,7 +131,7 @@ Route::get('/users/{id}/{name}', function ($id, $name) {
 
 В большинстве случаев роут не вызывает вид на прямую - как правило это делает контроллер. Чтобы создать контроллер мы будем использовать консольную утилиту Artisan, для этого переходим в корень приложения и в консоли пишем:
 
-```bash
+```
 php artisan make:controller PagesController
 ```
 
@@ -125,7 +141,7 @@ php artisan make:controller PagesController
 
 *app/Http/Controllers/PagesController.php*
 
-```php
+```
 <?php
 
 namespace App\Http\Controllers;
@@ -142,7 +158,7 @@ class PagesController extends Controller
 
 *app/Http/Controllers/PagesController.php*
 
-```php
+```
 <?php
 
 namespace App\Http\Controllers;
@@ -161,7 +177,7 @@ class PagesController extends Controller
 
 *routes/web.php*
 
-```php
+```
 Route::get('/', 'PagesController@index');
 Route::get('/about', 'PagesController@about');
 Route::get('/services', 'PagesController@services');
@@ -171,7 +187,7 @@ Route::get('/services', 'PagesController@services');
 
 *app/Http/Controllers/PagesController.php*
 
-```php
+```
 <?php
 
 namespace App\Http\Controllers;
@@ -198,7 +214,7 @@ class PagesController extends Controller
 
 *resources/views/pages/index.blade.php*
 
-```php
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -215,13 +231,15 @@ class PagesController extends Controller
 
 В `title` мы выводим информацию поля `name` из файла `.env`, а если там ничего нет, тогда установим значение по умолчанию.
 
+<div id="blade"></div>
+
 ## Blade шаблонизация и компиляция активов
 
 Мы можем определить основной шаблон, который будет наследоваться остальными, то есть остальные будут его расширять и использовать общие блоки, но с возможностью их переоределения.
 
 *resources/views/layouts/app.blade.php*
 
-```php
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -240,7 +258,7 @@ class PagesController extends Controller
 
 *resources/views/pages/index.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -254,7 +272,7 @@ class PagesController extends Controller
 
 *app/Http/Controllers/PagesController.php*
 
-```php
+```
 class PagesController extends Controller
 {
     public function index(){
@@ -270,7 +288,7 @@ class PagesController extends Controller
 
 *resources/views/pages/index.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -282,7 +300,7 @@ class PagesController extends Controller
 
 *app/Http/Controllers/PagesController.php*
 
-```php
+```
     //..
     public function about(){
         $title = "Some info about Us";
@@ -295,7 +313,7 @@ class PagesController extends Controller
 
 *resources/views/pages/index.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -307,7 +325,7 @@ class PagesController extends Controller
 
 *app/Http/Controllers/PagesController.php*
 
-```php
+```
     //..
     public function services(){
         $data = array(
@@ -323,7 +341,7 @@ class PagesController extends Controller
 
 *resources/views/pages/services.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -342,7 +360,7 @@ class PagesController extends Controller
 
 *resources/views/layouts/app.blade.php*
 
-```php
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -366,7 +384,7 @@ class PagesController extends Controller
 
 Запускаем команду
 
-```bash
+```
 npm install
 ```
 
@@ -376,13 +394,13 @@ npm install
 
 *resources/sass/_variables.scss*
 
-```scss
+```
 $body-bg: red;
 ```
 
 Запускаем `laravel-mix` командой
 
-```bash
+```
 npm run dev
 ```
 
@@ -392,7 +410,7 @@ npm run dev
 
 Если вы не хотите запускать команду компиляции каждый раз при изменении исходников, вы можете использовать другую команду:
 
-```bash
+```
 npm run watch
 ```
 
@@ -402,7 +420,7 @@ npm run watch
 
 *resources/sass/_custom.scss*
 
-```scss
+```
 body{
     background-color: blue !important;
 }
@@ -412,7 +430,7 @@ body{
 
 *resources/sass/app.scss*
 
-```scss
+```
 // Custom
 @import "custom";
 ```
@@ -421,7 +439,7 @@ body{
 
 *resources/views/layouts/app.blade.php*
 
-```php
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -439,7 +457,7 @@ body{
 
 *resources/views/include/navbar.blade.php*
 
-```php
+```
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-laravel">
     <div class="container">
         <a class="navbar-brand" href="/">{{config('app.name', 'Laravel APP')}}</a>
@@ -467,7 +485,7 @@ body{
 
 *resources/views/pages/index.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -482,13 +500,15 @@ body{
 @endsection
 ```
 
+<div id="model"></div>
+
 ## Модели и миграции базы данных
 
 В самом начале нам нужно создать БД и пользователя (если нужно).
 
 Затем нам нужно создать модель `Post` и миграцию для неё:
 
-```bash
+```
 php artisan make:model Post -m
 ```
 
@@ -498,7 +518,7 @@ php artisan make:model Post -m
 
 *database/migrations/2017_11_30_183740_create_posts_table.php*
 
-```php
+```
 class CreatePostsTable extends Migration
 {
     public function up()
@@ -565,7 +585,7 @@ Migrating: 2014_10_12_000000_create_users_table
 
 *app/Providers/AppServiceProvider.php*
 
-```php
+```
 <?php
 
 namespace App\Providers;
@@ -590,7 +610,7 @@ class AppServiceProvider extends ServiceProvider
 
 Теперь можно запустить миграцию:
 
-```bash
+```
 php artisan migrate
 ```
 
@@ -637,7 +657,7 @@ Psy Shell v0.8.15 (PHP 7.1.11 — cli) by Justin Hileman
 
 Чтобы не создавать эти методы самостоятельно, можно этот процес автоматизировать с помощью команды:
 
-```bash
+```
 php artisan make:controller PostsController --resource
 ```
 
@@ -663,7 +683,7 @@ php artisan route:list
 
 *routes/web.php*
 
-```php
+```
 Route::resource('posts', 'PostsController');
 ```
 
@@ -688,13 +708,15 @@ php artisan route:list
 +--------+-----------+-------------------+---------------+-----------------------------------------------+--------------+
 ```
 
+<div id="eloquent"></div>
+
 ## Получение данных с использованием ORM Eloquent
 
 В моделе нам не прийдётся писать слишком много кода, потому что в нашем распоряжении имеется множество методов, которые нам в этом помогут. В начале нам нужно создать несколько переменных - определим название таблицы в БД, потому что в нашем случае модель названа в единственном числе, а таблица в множественном.
 
 *app/Post.php*
 
-```php
+```
 <?php
 
 namespace App;
@@ -718,7 +740,7 @@ class Post extends Model
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function index()
 {
     return view('posts.index');
@@ -729,7 +751,7 @@ public function index()
 
 *resources/views/posts/index.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -744,7 +766,7 @@ public function index()
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 <?php
 
 namespace App\Http\Controllers;
@@ -769,7 +791,7 @@ class PostsController extends Controller
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function index()
 {
     $posts = Post::all();
@@ -781,7 +803,7 @@ public function index()
 
 *resources/views/posts/index.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -805,7 +827,7 @@ public function index()
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function show($id)
 {
     $post = Post::find($id);
@@ -819,7 +841,7 @@ public function show($id)
 
 *resources/views/posts/show.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -840,7 +862,7 @@ public function show($id)
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -867,7 +889,7 @@ class PostsController extends Controller
 
 *resources/views/posts/index.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -889,6 +911,8 @@ class PostsController extends Controller
 @endsection
 ```
 
+<div id="fa"></div>
+
 ## Установка Font Awesome
 
 Ставим через `npm`:
@@ -901,7 +925,7 @@ npm i font-awesome --save
 
 *resources/sass/app.scss*
 
-```scss
+```
 @import '~font-awesome/scss/font-awesome';
 ```
 
@@ -911,13 +935,15 @@ npm i font-awesome --save
 npm run dev
 ```
 
+<div id="form"></div>
+
 ## Формы и сохранение данных
 
 За вывод формы у нас будет отвечать метод `create()`, давайте пока что просто выдем вид:
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function create()
 {
     return view('posts.create');
@@ -928,7 +954,7 @@ public function create()
 
 *resources/views/posts/create.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -940,7 +966,7 @@ public function create()
 
 *resources/views/posts/create.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -967,7 +993,7 @@ public function create()
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function store(Request $request)
 {
     $this->validate($request, [
@@ -983,7 +1009,7 @@ public function store(Request $request)
 
 *resources/views/include/messages.blade.php*
 
-```php
+```
 @if(count($errors) > 0)
     @foreach($errors->all() as $error)
         <div class="alert alert-danger">
@@ -1009,7 +1035,7 @@ public function store(Request $request)
 
 *resources/views/layouts/app.blade.php*
 
-```php
+```
 <div class="container">
     @include('include.messages')
     @yield('content')
@@ -1020,7 +1046,7 @@ Cохраним данные в БД и выведем сообщение что
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function store(Request $request)
 {
     $this->validate($request, [
@@ -1039,13 +1065,15 @@ public function store(Request $request)
 }
 ```
 
+<div id="edit"></div>
+
 ## Редактирование данных
 
 Добавим ссылку для редактирования:
 
 *resources/views/posts/show.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -1065,7 +1093,7 @@ public function store(Request $request)
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function edit($id)
 {
     $post = Post::find($id);
@@ -1078,7 +1106,7 @@ public function edit($id)
 
 *resources/views/posts/edit.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -1106,7 +1134,7 @@ public function edit($id)
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function update(Request $request, $id)
 {
     $this->validate($request, [
@@ -1123,13 +1151,15 @@ public function update(Request $request, $id)
 }
 ```
 
+<div id="del"></div>
+
 ## Удаление данных
 
 Для удаления нам нужно добавить новую форму на страницу с отображением отдельной статьи:
 
 *resources/views/posts/show.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -1154,7 +1184,7 @@ public function update(Request $request, $id)
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function destroy($id)
 {
     $post = Post::find($id);
@@ -1163,13 +1193,15 @@ public function destroy($id)
 }
 ```
 
+<div id="auth"></div>
+
 ## Авторизация пользователей
 
 Ранее мы запускали миграции и в том числе ту, которая создала для нас таблицу `users`, которая вполне подходит нам для работы.
 
 Чтобы сгенерировать все остальные файлы для авторизации нам нужно запустить ещё одну команду, при этом лучше изменить название файла *resources/views/layouts/app.blade.php* добавив нижнее подчёркивание в начале иначе этот файл может быть перезаписан в процессе выполнения данной команды:
 
-```bash
+```
 php artisan make:auth
 ```
 
@@ -1177,7 +1209,7 @@ php artisan make:auth
 
 *resources/views/layouts/app.blade.php*
 
-```php
+```
 <!DOCTYPE html>
 <html lang="lang="{{ str_replace('_', '-', app()->getLocale()) }}"">
 <head>
@@ -1205,7 +1237,7 @@ php artisan make:auth
 
 *resources/views/include/navbar.blade.php*
 
-```php
+```
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-laravel">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
@@ -1269,7 +1301,7 @@ php artisan make:auth
 
 *resources/views/dashboard.blade.php*
 
-```php
+```
 @extends('layouts.app')
 
 @section('content')
@@ -1296,7 +1328,7 @@ php artisan make:auth
 
 Теперь нам нужно создать миграцию, чтобы связать необходимый пост с определённым автором:
 
-```bash
+```
 php artisan make:migration add_user_id_to_posts
 ```
 
@@ -1304,7 +1336,7 @@ php artisan make:migration add_user_id_to_posts
 
 *database/migrations/2017_12_03_175125_add_user_id_to_posts.php*
 
-```php
+```
 class AddUserIdToPosts extends Migration
 {
     public function up()
@@ -1325,7 +1357,7 @@ class AddUserIdToPosts extends Migration
 
 Запустим миграцию:
 
-```bash
+```
 php artisan migrate
 ```
 
@@ -1333,7 +1365,7 @@ php artisan migrate
 
 *app/Http/Controllers/PostsController.php*
 
-```php
+```
 public function store(Request $request)
 {
     $this->validate($request, [
@@ -1354,3 +1386,142 @@ public function store(Request $request)
 ```
 
 Теперь если мы попробуем добавить новую статью, то мы увидим что ID пользователя добавляется автоматически.
+
+<div id="rel"></div>
+
+## Связи моделей
+
+Чтобы создать взаимосвязь очень просто - нужно создать функцию в модели `Post`, которая определяет что посты должны пренадлежать определённому пользователю:
+
+*app/Post.php*
+
+```
+class Post extends Model
+{
+    //..
+    public function user(){
+        return $this->belongsTo('App\User');
+    }
+}
+```
+
+Кроме этого нам нужно создать похожую функцию в модели `User`, которая определяет что у одного пользователя может быть несколько постов.
+
+Eloquent определяет внешний ключ отношения по имени модели. В данном случае предполагается, что это `user_id`. Если вы хотите перекрыть стандартное имя, передайте второй параметр методу `hasMany()`. Но в нашем случае всё стандартно, то есть в таблице `posts` уже созданно поле `user_id` по которому и создаваться JOIN:
+
+*app/User.php*
+
+```
+class User extends Authenticatable
+{
+    //..
+    public function posts(){
+        return $this->hasMany('App\Post');
+    }
+}
+```
+
+Теперь в контрольной панели управления мы можем выводить только те посты, которые принадлежать конкретному пользователю:
+
+*app/Http/Controllers/DashboardController.php*
+
+```
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\User;
+
+class DashboardController extends Controller
+{
+    //..
+    public function index()
+    {
+        $user_id = auth()->user()->id;
+        $user = User::find($user_id);
+        return view('dashboard')->with('posts', $user->posts);
+    }
+}
+```
+
+Обратите внимание что мы обращаемся не к методу объекта, а к его свойству, хотя на самом деле в модели мы определяли функцию.
+
+Поправим вид контрольной панели и выведем список постов в виде таблицы:
+
+*resources/views/dashboard.blade.php*
+
+```
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">Dashboard</div>
+
+                <div class="panel-body">
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+                    <p><a href="/posts/create" class="btn btn-primary">Create Post</a></p>
+                    <h3>You Blog Posts</h3>
+                    @if(count($posts) > 0)
+                        <table class="table table-striped">
+                            <tr>
+                                <th width="80%">Title</th>
+                                <th width="10%"></th>
+                                <th width="10%"></th>
+                            </tr>
+                            @foreach($posts as $post)
+                                <tr>
+                                    <td>{{ $post->title }}</td>
+                                    <td><a href="/posts/{{ $post->id }}/edit" class="btn btn-outline-secondary">Edit</a></td>
+                                    <td>
+                                        <form action="{{route('posts.destroy', $post->id)}}" method="POST" class="pull-right">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <input type="submit" value="Delete" class="btn btn-danger">
+                                            {{csrf_field()}}
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </table>
+                    @else
+                        <p class="alert alert-info">You have no posts</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+```
+
+Если список постов у нас выводится без ошибок, то теперь мы можем зарегистрировать нового пользователя и попробовать от его имени создать несколько постов, чтобы проверить, что у нас в панели управления будут выводится только те посты, которые пренадлежат конкретному пользователю.
+
+Теперь мы можем вывести имя пользователя, который опубликовал статью:
+
+*resources/views/posts/index.blade.php*
+
+```
+@extends('layouts.app')
+
+@section('content')
+    <h1>Posts</h1>
+    @if(count($posts) > 0)
+        @foreach($posts as $post)
+            <div class="well">
+                <h3><a href="posts/{{ $post->id}}">{{ $post->title }}</a></h3>
+                <small>Written on {{ $post->created_at }} by {{ $post->user->name }}</small>
+            </div>
+        @endforeach
+        {{ $posts->links() }}
+    @else
+        <p>Posts not found</p>
+    @endif
+@endsection
+```
