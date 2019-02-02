@@ -18,3 +18,6 @@ Route::resource('posts', 'PostsController');
 Auth::routes();
 
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
+
+Route::get('/contact', 'PagesController@contact');
+Route::post('/contact', 'PagesController@email')->name('contact.email');
