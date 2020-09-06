@@ -7,7 +7,7 @@
             <h1>{{$post->title}}</h1>
             <p><small>{{$post->created_at}}</small></p>
             @if($post->image)
-                <img src="/storage/images/{{ $post->image }}" alt="{{ $post->title }}" class="img-thumbnail img-fluid">
+                <img src="/storage/app/public/images/{{ $post->image }}" alt="{{ $post->title }}" class="img-thumbnail img-fluid">
             @endif
             <div class="mt-3">{{$post->body}}</div>
         </div>
