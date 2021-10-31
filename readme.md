@@ -1,2 +1,5 @@
-# Simple CMS based on Laravel PHP framework
+# Simple CMS based on Laravel
 
+Demo Dashboard:
+
+![screenshot.png](screenshot.png)
