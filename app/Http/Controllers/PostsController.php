@@ -46,7 +46,7 @@ class PostsController extends Controller
         $this->validate($request, [
             'title' => 'required',
             'body' => 'required',
-            'image' => 'image|nullable|max:1999'
+            'image' => 'mimes:jpeg,jpg,png,gif|nullable|max:1999'
         ]);
 
         if($request->hasFile('image')){
@@ -115,7 +115,7 @@ class PostsController extends Controller
         $this->validate($request, [
             'title' => 'required',
             'body' => 'required',
-            'image' => 'image|nullable|max:1999'
+            'image' => 'mimes:jpeg,jpg,png,gif|nullable|max:1999'
         ]);
 
         if($request->hasFile('image')){
