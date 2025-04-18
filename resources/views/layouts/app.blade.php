@@ -17,6 +17,18 @@
 @yield('content')
 </div>
 
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <hr>
+                <p class="pull-left">2018 © All right reserved</p>
+                <p class="pull-right">Developed by <a href="https://github.com/kamuz">Volodymyr Kamuz</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
 <script src="{{asset('js/app.js')}}"></script>
 </body>
 </html>

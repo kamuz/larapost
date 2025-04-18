@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <img src="/storage/app/public/images/{{ $post->image }}" alt="{{ $post->title }}" class="img-thumbnail img-fluid">
+                            <img src="/public/storage/images/{{ $post->image }}" alt="{{ $post->title }}" class="img-thumbnail img-fluid">
                         </div>
                         <div class="col-md-8">
                             <h3><a href="posts/{{ $post->id}}">{{ $post->title }}</a></h3>

@@ -11,6 +11,7 @@
             <label for="body">Body</label>
             <textarea name="body" id="body" class="form-control" placeholder="Body" cols="30" rows="10">{{ $post->body }}</textarea>
         </div>
+        <img src="/public/storage/images/{{ $post->image }}" alt="{{ $post->title }}" class="img-thumbnail img-fluid mb-3">
         <div class="form-group">
             <input type="file" name="image" id="image">
         </div>

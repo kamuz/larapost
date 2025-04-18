@@ -15,5 +15,7 @@
 
 <h1>{{$title}}</h1>
 
-<div id="app"></div>
+<p>Lorem, ipsum dolor sit amet, consectetur adipisicing elit. Repellat, laboriosam, nihil. Quibusdam, hic, animi. Officia earum reiciendis natus ipsam vel, animi nostrum obcaecati quam accusamus numquam! Aut commodi vel minus.</p>
+<p>Facilis consequatur neque quos, eum. Incidunt deleniti temporibus dolorem perspiciatis dolore voluptas fuga quas ipsum, impedit doloremque, illum, molestias laborum animi aliquid dignissimos nobis. Accusamus, eligendi, quos. Sunt, facilis, quaerat!</p>
+
 @endsection
