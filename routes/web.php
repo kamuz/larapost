@@ -21,3 +21,12 @@ Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 
 Route::get('/contact', 'PagesController@contact');
 Route::post('/contact', 'PagesController@email')->name('contact.email');
+
+Route::get('/test-email', function () {
+    \Illuminate\Support\Facades\Mail::raw('Test email content', function ($message) {
+        $message->to('your-email@example.com')
+                ->subject('Test Email');
+    });
+
+    return 'Email sent';
+});

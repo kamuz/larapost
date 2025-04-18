@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Mail\ContactMessage;
+use Illuminate\Support\Facades\Mail;
 
 class PagesController extends Controller
 {
@@ -27,20 +29,21 @@ class PagesController extends Controller
         return view('pages.contact');
     }
 
-    public function email(Request $request){
+    public function email(Request $request)
+    {
         $this->validate($request, [
             'name' => 'required|max:255',
             'email' => 'required|email',
             'message' => 'required'
         ]);
 
-        // return dd($data);
+        $data = [
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'message' => $request->input('message'),
+        ];
 
-        $message = '<p>From Name: ' . $request['name'] . '</p>';
-        $message .= '<p>From Email: ' . $request['email'] . '</p>';
-        $message .= '<p>Message: </p>' . $request['message'];
-
-        mail('v.kamuz@gmail.com', 'Message from my site', $message);
+        Mail::to('v.kamuz@gmail.com')->send(new ContactMessage($data));
 
         return redirect('/contact')->with('success', 'Your message has been sent!');
     }
