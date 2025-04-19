@@ -49,6 +49,8 @@ class PostsController extends Controller
             'image' => 'mimes:jpeg,jpg,png,gif|nullable|max:1999'
         ]);
 
+        $filenameToStore = '';
+
         if($request->hasFile('image')){
             // Get file name with extension
             $filenameWithExt = $request->file('image')->getClientOriginalName();
