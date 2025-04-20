@@ -52,9 +52,9 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://larapost.loc'),
+    'url' => env('APP_URL', ''),
 
-    'asset_url' => env('ASSET_URL', 'https://larapost.loc/public'),
+    'asset_url' => env('ASSET_URL', ''),
 
     /*
     |--------------------------------------------------------------------------
